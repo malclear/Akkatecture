@@ -1,4 +1,4 @@
-// The MIT License (MIT)
+﻿// The MIT License (MIT)
 //
 // Copyright (c) 2018 - 2019 Lutando Ngqakaza
 // https://github.com/Lutando/Akkatecture 
@@ -21,26 +21,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Akka.Event;
-using Akkatecture.Jobs;
+using System;
+using System.Linq.Expressions;
+using Akkatecture.Sagas.AggregateSaga;
 
-namespace Akkatecture.Examples.Jobs
+namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
 {
-    public class PrintJobRunner : JobRunner<PrintJob, PrintJobId>,
-        IRun<PrintJob>
+    public class TestTimeoutSagaManager : AggregateSagaManager<TestTimeoutSaga,TestTimeoutSagaId,TestTimeoutSagaLocator>
     {
-        public bool Run(PrintJob job)
+        public TestTimeoutSagaManager(Expression<Func<TestTimeoutSaga>> sagaFactory)
+            : base(sagaFactory)
         {
-            //Only thing that print runner does is it prints out the contents of the job message
-            var time = Context.System.Scheduler.Now.DateTime;
-            Context
-                .GetLogger()
-                .Info(
-                    "PrintJobRunner at Timestamp={0}, is printing Content={1}",
-                    time,
-                    job.Content);
-
-            return true;
         }
     }
 }

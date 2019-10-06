@@ -66,17 +66,29 @@ namespace Akkatecture.Sagas.AggregateSaga
                     sagaType
                         .GetAsyncSagaEventSubscriptionTypes();
 
+                //TODO ML, is this required?
+                var sagaTimeoutSubscriptionTypes =
+                    sagaType
+                        .GetSagaTimeoutSubscriptionTypes();
+
                 var subscriptionTypes = new List<Type>();
                 
                 subscriptionTypes.AddRange(sagaEventSubscriptionTypes);
                 subscriptionTypes.AddRange(asyncSagaEventSubscriptionTypes);
+                
+                //TODO ML, is this required?
+                subscriptionTypes.AddRange(sagaTimeoutSubscriptionTypes);
 
+                //TODO ML, what is the purpose of this list? Should timeout subscriptions be part of it?  
                 _subscriptionTypes = subscriptionTypes.AsReadOnly();
                 
                 foreach (var type in _subscriptionTypes)
                 {
                     Context.System.EventStream.Subscribe(Self, type);
                 }
+//
+//                if(sagaTimeoutSubscriptionTypes.Count > 0)
+//                    SagaTimeoutManager = Context.ActorOf(Props.Create(() => new SagaTimeoutManager()));
             }
 
             if (Settings.AutoSpawnOnReceive)
@@ -124,8 +136,8 @@ namespace Akkatecture.Sagas.AggregateSaga
                 withinTimeMilliseconds: 3000,
                 localOnlyDecider: x =>
                 {
-
-                    Logger.Warning("{0} will supervise Exception={1} to be decided as {2}.",GetType().PrettyPrint(), x.ToString(),Directive.Restart);
+                    Logger.Warning("{0} will supervise Exception={1} to be decided as {2}.",
+                        GetType().PrettyPrint(), x.ToString(),Directive.Restart);
                     return Directive.Restart;
                 });
         }
@@ -147,6 +159,7 @@ namespace Akkatecture.Sagas.AggregateSaga
             return saga;
         }
         
+//        private IActorRef SagaTimeoutManager { get; set; }
+        
     }
-    
 }

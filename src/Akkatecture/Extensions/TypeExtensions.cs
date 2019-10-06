@@ -1,4 +1,4 @@
-﻿// The MIT License (MIT)
+// The MIT License (MIT)
 //
 // Copyright (c) 2015-2019 Rasmus Mikkelsen
 // Copyright (c) 2015-2019 eBay Software Foundation
@@ -36,6 +36,7 @@ using Akkatecture.Core;
 using Akkatecture.Events;
 using Akkatecture.Jobs;
 using Akkatecture.Sagas;
+using Akkatecture.Sagas.SagaTimeouts;
 using Akkatecture.Subscribers;
 
 namespace Akkatecture.Extensions
@@ -126,7 +127,7 @@ namespace Akkatecture.Extensions
         public static JobName GetJobName(
             this Type jobType)
         {
-            return JobNames.GetOrAdd(
+            var jobName =  JobNames.GetOrAdd(
                 jobType,
                 t =>
                 {
@@ -139,6 +140,7 @@ namespace Akkatecture.Extensions
                         t.GetTypeInfo().GetCustomAttributes<JobNameAttribute>().SingleOrDefault()?.Name ??
                         t.Name);
                 });
+            return jobName;
         }
 
         internal static IReadOnlyDictionary<Type, Action<T, IAggregateEvent>> GetAggregateEventApplyMethods<TAggregate, TIdentity, T>(this Type type)
@@ -372,6 +374,23 @@ namespace Akkatecture.Extensions
             return startedByEventTypes;
         }
         
+        //TODO ML, make Async version of this. 
+        internal static IReadOnlyList<Type> GetSagaTimeoutSubscriptionTypes(this Type type)
+        {
+            var interfaces = type
+                .GetTypeInfo()
+                .GetInterfaces()
+                .Select(i => i.GetTypeInfo())
+                .ToList();
+            
+            var sagaTimeoutSubscriptionTypes = interfaces
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISagaHandlesTimeout<>))
+                .Select(t => typeof(ISagaTimeout<>).MakeGenericType(t.GetGenericArguments()[0]))
+                .ToList();
+            
+            return sagaTimeoutSubscriptionTypes;
+        }
+        
         internal static IReadOnlyDictionary<Type, Func<T,IAggregateEvent, IAggregateEvent>> GetAggregateEventUpcastMethods<TAggregate, TIdentity, T>(this Type type)
             where TAggregate : IAggregateRoot<TIdentity>
             where TIdentity : IIdentity
@@ -427,6 +446,5 @@ namespace Akkatecture.Extensions
             }
             return type;
         }
-
     }
 }

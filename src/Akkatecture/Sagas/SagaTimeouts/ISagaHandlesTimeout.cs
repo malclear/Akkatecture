@@ -1,5 +1,9 @@
 // The MIT License (MIT)
 //
+// Copyright (c) 2015-2019 Rasmus Mikkelsen
+// Copyright (c) 2015-2019 eBay Software Foundation
+// Modified from original source https://github.com/eventflow/EventFlow
+//
 // Copyright (c) 2018 - 2019 Lutando Ngqakaza
 // https://github.com/Lutando/Akkatecture 
 // 
@@ -21,26 +25,21 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Akka.Event;
-using Akkatecture.Jobs;
-
-namespace Akkatecture.Examples.Jobs
+namespace Akkatecture.Sagas.SagaTimeouts
 {
-    public class PrintJobRunner : JobRunner<PrintJob, PrintJobId>,
-        IRun<PrintJob>
+    public interface ISagaHandlesTimeout<TTimeout> : ISaga
+        where TTimeout : class, ISagaTimeout<TTimeout>
     {
-        public bool Run(PrintJob job)
-        {
-            //Only thing that print runner does is it prints out the contents of the job message
-            var time = Context.System.Scheduler.Now.DateTime;
-            Context
-                .GetLogger()
-                .Info(
-                    "PrintJobRunner at Timestamp={0}, is printing Content={1}",
-                    time,
-                    job.Content);
+        bool HandleTimeout(ISagaTimeout<TTimeout> timeout);
+    }
 
-            return true;
-        }
+    public interface ISagaTimeout<TTimeout> : ISagaTimeout //TODO ML, Do I need the "ISaga" interface here?
+        where TTimeout : class
+    {
+        TTimeout Value { get; }
+    }
+
+    public interface ISagaTimeout
+    {
     }
 }

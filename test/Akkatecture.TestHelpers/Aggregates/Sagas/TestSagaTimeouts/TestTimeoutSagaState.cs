@@ -1,4 +1,4 @@
-// The MIT License (MIT)
+﻿// The MIT License (MIT)
 //
 // Copyright (c) 2018 - 2019 Lutando Ngqakaza
 // https://github.com/Lutando/Akkatecture 
@@ -21,26 +21,33 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Akka.Event;
-using Akkatecture.Jobs;
+using Akkatecture.Aggregates;
+using Akkatecture.Sagas;
+using Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts.Events;
 
-namespace Akkatecture.Examples.Jobs
+namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
 {
-    public class PrintJobRunner : JobRunner<PrintJob, PrintJobId>,
-        IRun<PrintJob>
+    public class TestTimeoutSagaState : SagaState<TestTimeoutSaga, TestTimeoutSagaId, IMessageApplier<TestTimeoutSaga, TestTimeoutSagaId>>,
+        IApply<TestTimeoutSagaStartedEvent>,
+        IApply<TestTimeoutSagaTransactionCompletedEvent>,
+        IApply<TestTimeoutSagaCompletedEvent>
     {
-        public bool Run(PrintJob job)
+        public TestAggregateId Sender { get; set; }
+        public TestAggregateId Receiver { get; set; }
+        public Entities.Test Test { get; set; }
+        public void Apply(TestTimeoutSagaStartedEvent aggregateEvent)
         {
-            //Only thing that print runner does is it prints out the contents of the job message
-            var time = Context.System.Scheduler.Now.DateTime;
-            Context
-                .GetLogger()
-                .Info(
-                    "PrintJobRunner at Timestamp={0}, is printing Content={1}",
-                    time,
-                    job.Content);
+            Sender = aggregateEvent.Sender;
+            Receiver = aggregateEvent.Receiver;
+            Test = aggregateEvent.SentTest;
+        }
 
-            return true;
+        public void Apply(TestTimeoutSagaTransactionCompletedEvent aggregateEvent)
+        {
+        }
+
+        public void Apply(TestTimeoutSagaCompletedEvent aggregateEvent)
+        {
         }
     }
 }
