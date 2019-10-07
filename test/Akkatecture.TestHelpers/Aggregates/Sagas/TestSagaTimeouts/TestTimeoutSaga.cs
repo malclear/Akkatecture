@@ -38,7 +38,8 @@ namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
     public class TestTimeoutSaga : AggregateSaga<TestTimeoutSaga,TestTimeoutSagaId,TestTimeoutSagaState>,
         ISagaIsStartedBy<TestAggregate, TestAggregateId, TestSentEvent>,
         ISagaHandles<TestAggregate, TestAggregateId, TestReceivedEvent>, 
-        ISagaHandlesTimeout<TestTimeoutSagaTimeout>
+        ISagaHandlesTimeout<TestTimeoutSagaTimeout>,
+        ISagaHandlesTimeout<TestTimeoutSagaTimeout2>
     {
         private IActorRef TestAggregateManager { get; }
         public TestTimeoutSaga(IActorRef testAggregateManager)
@@ -58,6 +59,9 @@ namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
                     domainEvent.AggregateEvent.Test);
                 RequestTimeout(new TestTimeoutSagaTimeout("This is my test timeout message."), 
                     TimeSpan.FromSeconds(5));
+                
+                RequestTimeout(new TestTimeoutSagaTimeout2("222222! This is my test timeout message. 222222!"), 
+                    TimeSpan.FromSeconds(10));
                 
                 Emit(new TestTimeoutSagaStartedEvent(domainEvent.AggregateIdentity, 
                     domainEvent.AggregateEvent.RecipientAggregateId, domainEvent.AggregateEvent.Test));
@@ -92,6 +96,13 @@ namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
         public bool HandleTimeout(TestTimeoutSagaTimeout timeout)
         {
             var message = ((TestTimeoutSagaTimeout) timeout).MessageToInclude;
+            Emit(new TestTimeoutSagaTimeoutOccurred(message));
+            return true;            
+        }
+        
+        public bool HandleTimeout(TestTimeoutSagaTimeout2 timeout)
+        {
+            var message = ((TestTimeoutSagaTimeout2) timeout).MessageToInclude;
             Emit(new TestTimeoutSagaTimeoutOccurred(message));
             return true;            
         }

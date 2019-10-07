@@ -16,7 +16,20 @@ namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts.SagaTimeouts
         {
             MessageToInclude = "Some default message.";
         }
+    }
+    
+    public class TestTimeoutSagaTimeout2: ISagaTimeoutJob
+    {
+        public string MessageToInclude { get; set; }
 
-        public TestTimeoutSagaTimeout Value => this;
+        public TestTimeoutSagaTimeout2(string messageToInclude)
+        {
+            MessageToInclude = messageToInclude;
+        }
+        
+        public TestTimeoutSagaTimeout2()
+        {
+            MessageToInclude = "Some default message from timeout 2!!.";
+        }
     }
 }

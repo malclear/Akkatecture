@@ -98,7 +98,13 @@ namespace Akkatecture.Tests.IntegrationTests.Aggregates.Sagas
 
             eventProbe.ExpectMsg<DomainEvent<TestTimeoutSaga, TestTimeoutSagaId, TestTimeoutSagaCompletedEvent>>(TimeSpan.FromMinutes(1));
             
-            eventProbe.ExpectMsg<DomainEvent<TestTimeoutSaga, TestTimeoutSagaId, TestTimeoutSagaTimeoutOccurred>>(TimeSpan.FromSeconds(15));
+            eventProbe.ExpectMsg<DomainEvent<TestTimeoutSaga, TestTimeoutSagaId, TestTimeoutSagaTimeoutOccurred>>(
+                //e => e.AggregateEvent.TimeoutMessage.StartsWith("This is my test"),
+                TimeSpan.FromSeconds(15));
+            
+            eventProbe.ExpectMsg<DomainEvent<TestTimeoutSaga, TestTimeoutSagaId, TestTimeoutSagaTimeoutOccurred>>(
+                //e => e.AggregateEvent.TimeoutMessage.StartsWith("222222! This is my test"),
+                TimeSpan.FromSeconds(15));
         }
     }
 }
