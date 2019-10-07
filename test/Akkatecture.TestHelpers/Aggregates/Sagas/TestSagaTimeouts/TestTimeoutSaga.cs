@@ -44,7 +44,7 @@ namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
         public TestTimeoutSaga(IActorRef testAggregateManager)
         {
             TestAggregateManager = testAggregateManager;
-            Command<EmitTestSagaTimeoutState>(Handle);
+            Command<EmitTestTimeoutSagaState>(Handle);
         }
 
         public bool Handle(IDomainEvent<TestAggregate, TestAggregateId, TestSentEvent> domainEvent)
@@ -57,7 +57,7 @@ namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
                     domainEvent.AggregateIdentity,
                     domainEvent.AggregateEvent.Test);
                 RequestTimeout(new TestTimeoutSagaTimeout("This is my test timeout message."), 
-                    TimeSpan.FromSeconds(6));
+                    TimeSpan.FromSeconds(5));
                 
                 Emit(new TestTimeoutSagaStartedEvent(domainEvent.AggregateIdentity, 
                     domainEvent.AggregateEvent.RecipientAggregateId, domainEvent.AggregateEvent.Test));
@@ -73,23 +73,23 @@ namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
             if (!IsNew)
             {
                 Emit(new TestTimeoutSagaTransactionCompletedEvent());
-                Self.Tell(new EmitTestSagaTimeoutState());
+                Self.Tell(new EmitTestTimeoutSagaState());
 
             }
             return true;
         }
 
-        private bool Handle(EmitTestSagaTimeoutState testCommmand)
+        private bool Handle(EmitTestTimeoutSagaState testTimeoutCommmand)
         {
             Emit(new TestTimeoutSagaCompletedEvent(State));
             return true;
         }
 
-        private class EmitTestSagaTimeoutState
+        private class EmitTestTimeoutSagaState
         {
         }
 
-        public bool HandleTimeout(ISagaTimeout<TestTimeoutSagaTimeout> timeout)
+        public bool HandleTimeout(TestTimeoutSagaTimeout timeout)
         {
             var message = ((TestTimeoutSagaTimeout) timeout).MessageToInclude;
             Emit(new TestTimeoutSagaTimeoutOccurred(message));

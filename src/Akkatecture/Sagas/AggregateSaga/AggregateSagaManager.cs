@@ -66,18 +66,18 @@ namespace Akkatecture.Sagas.AggregateSaga
                     sagaType
                         .GetAsyncSagaEventSubscriptionTypes();
 
-                //TODO ML, is this required?
-                var sagaTimeoutSubscriptionTypes =
-                    sagaType
-                        .GetSagaTimeoutSubscriptionTypes();
+//                //TODO ML, is this required?
+//                var sagaTimeoutSubscriptionTypes =
+//                    sagaType
+//                        .GetSagaTimeoutSubscriptionTypes();
 
                 var subscriptionTypes = new List<Type>();
                 
                 subscriptionTypes.AddRange(sagaEventSubscriptionTypes);
                 subscriptionTypes.AddRange(asyncSagaEventSubscriptionTypes);
                 
-                //TODO ML, is this required?
-                subscriptionTypes.AddRange(sagaTimeoutSubscriptionTypes);
+//                //TODO ML, is this required?
+//                subscriptionTypes.AddRange(sagaTimeoutSubscriptionTypes);
 
                 //TODO ML, what is the purpose of this list? Should timeout subscriptions be part of it?  
                 _subscriptionTypes = subscriptionTypes.AsReadOnly();
@@ -86,9 +86,7 @@ namespace Akkatecture.Sagas.AggregateSaga
                 {
                     Context.System.EventStream.Subscribe(Self, type);
                 }
-//
-//                if(sagaTimeoutSubscriptionTypes.Count > 0)
-//                    SagaTimeoutManager = Context.ActorOf(Props.Create(() => new SagaTimeoutManager()));
+
             }
 
             if (Settings.AutoSpawnOnReceive)
@@ -158,8 +156,5 @@ namespace Akkatecture.Sagas.AggregateSaga
             Context.Watch(saga);
             return saga;
         }
-        
-//        private IActorRef SagaTimeoutManager { get; set; }
-        
     }
 }

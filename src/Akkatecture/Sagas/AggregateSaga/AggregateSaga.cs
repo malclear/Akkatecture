@@ -171,7 +171,9 @@ namespace Akkatecture.Sagas.AggregateSaga
 
                 var sagaTimeoutManagerType = typeof(SagaTimeoutManager<>).MakeGenericType(timeoutSubscriptionType);
                 var sagaTimeoutManager = Context.ActorOf(Props.Create(() => 
-                    (ActorBase) Activator.CreateInstance(sagaTimeoutManagerType, Self)));
+                    (ActorBase) Activator.CreateInstance(sagaTimeoutManagerType)), 
+                    $"{timeoutSubscriptionType.Name}-timeoutmanager");
+                
                 SagaTimeoutManagers.Add(timeoutSubscriptionType, sagaTimeoutManager);
             }
         }
@@ -402,20 +404,20 @@ namespace Akkatecture.Sagas.AggregateSaga
             return null;
         }
 
-        public void RequestTimeout<TTimeout>(TTimeout timeoutMessage, TimeSpan timeSpan) where TTimeout : class, ISagaTimeout<TTimeout>
+        public void RequestTimeout<TTimeout>(TTimeout timeoutMessage, TimeSpan timeSpan) 
+            where TTimeout : class, ISagaTimeoutJob
         {
-            var timeoutMessageType = timeoutMessage.GetType().GetInterface("ISagaTimeout`1");
+            var timeoutMessageType = timeoutMessage.GetType();
             var manager = SagaTimeoutManagers[timeoutMessageType];
             var sagaTimeoutId = SagaTimeoutId.New;
-            var timeout = new SagaTimeoutJob<TTimeout>(timeoutMessage);
-            var scheduledMessage = new Schedule<SagaTimeoutJob<TTimeout>, SagaTimeoutId>(
+            var scheduledMessage = new Schedule<TTimeout, SagaTimeoutId>(
                 sagaTimeoutId, 
-                timeout, 
+                timeoutMessage, 
                 DateTime.UtcNow.Add(timeSpan));
             manager.Tell(scheduledMessage);
         }
 
-        public void RequestTimeout<TTimeout>(TimeSpan timeSpan) where TTimeout : class, ISagaTimeout<TTimeout>, new()
+        public void RequestTimeout<TTimeout>(TimeSpan timeSpan) where TTimeout : class, ISagaTimeoutJob, new()
         {
             RequestTimeout(new TTimeout(), timeSpan);
         }

@@ -2,8 +2,9 @@ using Akkatecture.Jobs;
 
 namespace Akkatecture.Sagas.SagaTimeouts
 {
-    public class SagaTimeoutJobScheduler<TTimeout>: JobScheduler<SagaTimeoutJobScheduler<TTimeout>, 
-        SagaTimeoutJob<TTimeout>, SagaTimeoutId>
+    public class SagaTimeoutJobScheduler<TTimeout>: 
+        JobScheduler<SagaTimeoutJobScheduler<TTimeout>, TTimeout, SagaTimeoutId>
+        where TTimeout : ISagaTimeoutJob
     {
     }
 }

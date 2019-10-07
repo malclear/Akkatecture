@@ -3,20 +3,17 @@ using Akkatecture.Jobs;
 
 namespace Akkatecture.Sagas.SagaTimeouts
 {
-    public class SagaTimeoutJobRunner<TTimeout>:  JobRunner<SagaTimeoutJob<TTimeout>, 
-        SagaTimeoutId>, IRun<SagaTimeoutJob<TTimeout>>
+    public class SagaTimeoutJobRunner<TTimeout>:  JobRunner<TTimeout, SagaTimeoutId>, IRun<TTimeout>
+        where TTimeout: ISagaTimeoutJob, IJob
     {
-        private IActorRef _saga;
-
-        public SagaTimeoutJobRunner(IActorRef saga)
+        public SagaTimeoutJobRunner()
         {
-            _saga = saga;
         }
 
-        public bool Run(SagaTimeoutJob<TTimeout> job)
+        public bool Run(TTimeout job)
         {
-            //TODO ML, Should/can we send the SagaTimeoutJob's inner object to the grandparent of this actor? 
-            _saga.Tell(job.Timeout); 
+            //TODO ML, Should/can we send the SagaTimeoutJob's inner object to the grandparent of this actor?
+            Context.ActorSelection(Context.Parent.Path.Parent.Parent).Tell(job);
             return true;
         }
     }

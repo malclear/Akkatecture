@@ -385,7 +385,7 @@ namespace Akkatecture.Extensions
             
             var sagaTimeoutSubscriptionTypes = interfaces
                 .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISagaHandlesTimeout<>))
-                .Select(t => typeof(ISagaTimeout<>).MakeGenericType(t.GetGenericArguments()[0]))
+                .Select(t => t.GetGenericArguments()[0])
                 .ToList();
             
             return sagaTimeoutSubscriptionTypes;

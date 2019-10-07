@@ -3,7 +3,7 @@ using Akkatecture.Sagas.SagaTimeouts;
 
 namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts.SagaTimeouts
 {
-    public class TestTimeoutSagaTimeout: ISagaTimeout<TestTimeoutSagaTimeout>
+    public class TestTimeoutSagaTimeout: ISagaTimeoutJob
     {
         public string MessageToInclude { get; set; }
 

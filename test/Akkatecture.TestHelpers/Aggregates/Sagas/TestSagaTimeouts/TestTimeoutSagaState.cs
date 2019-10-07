@@ -30,7 +30,8 @@ namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
     public class TestTimeoutSagaState : SagaState<TestTimeoutSaga, TestTimeoutSagaId, IMessageApplier<TestTimeoutSaga, TestTimeoutSagaId>>,
         IApply<TestTimeoutSagaStartedEvent>,
         IApply<TestTimeoutSagaTransactionCompletedEvent>,
-        IApply<TestTimeoutSagaCompletedEvent>
+        IApply<TestTimeoutSagaCompletedEvent>, 
+        IApply<TestTimeoutSagaTimeoutOccurred>
     {
         public TestAggregateId Sender { get; set; }
         public TestAggregateId Receiver { get; set; }
@@ -47,6 +48,10 @@ namespace Akkatecture.TestHelpers.Aggregates.Sagas.TestSagaTimeouts
         }
 
         public void Apply(TestTimeoutSagaCompletedEvent aggregateEvent)
+        {
+        }
+
+        public void Apply(TestTimeoutSagaTimeoutOccurred asdf)
         {
         }
     }

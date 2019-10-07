@@ -28,18 +28,10 @@
 namespace Akkatecture.Sagas.SagaTimeouts
 {
     public interface ISagaHandlesTimeout<TTimeout> : ISaga
-        where TTimeout : class, ISagaTimeout<TTimeout>
+        where TTimeout : class, ISagaTimeoutJob
     {
-        bool HandleTimeout(ISagaTimeout<TTimeout> timeout);
+        bool HandleTimeout(TTimeout timeout);
     }
 
-    public interface ISagaTimeout<TTimeout> : ISagaTimeout //TODO ML, Do I need the "ISaga" interface here?
-        where TTimeout : class
-    {
-        TTimeout Value { get; }
-    }
 
-    public interface ISagaTimeout
-    {
-    }
 }
